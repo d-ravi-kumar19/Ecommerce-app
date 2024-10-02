@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} {{ product.name }}{% endblock title %}
+
+{% block content %}
+<div>
+
+    {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.image.name }}" class="max-h-[50vh]" />
+    {% else %}
+    <p>Image not available.</p>
+    {% endif %}
+    
+    <h3 class="font-semibold">{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    <h3 class="text-indigo-800">₹{{ product.price }}</h3>
+    <div>
+        <form action="{% url 'cart:cart_add'  product.id %}" method="post" id="add-to-cart-form">
+            {% csrf_token %}
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Add to cart</button>
+            <p id="message" class="mt-2 text-green-600"></p>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('add-to-cart-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const url = form.action;
+        const formdata = new FormData(form);
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': formdata.get('csrfmiddlewaretoken'),
+            },
+            body: formdata,
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageElement = document.getElementById('message');
+            if (data.success) {
+                messageElement.textContent = data.message;
+            } else {
+                messageElement.textContent = "Failed to add to cart";
+            }
+        })
+        .catch(error => {
+            console.error("Error: ", error);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Order confirmation{% endblock %}
+
+{% block content %}
+<h2>Your order placed successfully!</h2>
+<h3>Order id: #{{order.id}}</h3>
+
+<ul>
+    {% for item in order.items.all %}
+        <li>
+            <Strong>{{item.quantity}} * {{item.product.name}}</Strong>
+            <br>
+            <span>{{item.price}}</span>
+        </li>
+    {% endfor %}
+
+</ul>
+    <p>Total Price: ₹{{order.get_total_cost}}</p>
+{% endblock %}
